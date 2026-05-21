@@ -21,7 +21,7 @@ export const getLowStock = query({
                 .query("inventory")
                 .collect()
 
-        return item.filter((item) => item.stock < item.lowStockThreshold)
+        return item.filter((item) => item.stock <= item.lowStockThreshold)
     },
 })
 
@@ -43,34 +43,5 @@ export const updateStock = mutation({
             stock: item.stock + args.quantity,
             updatedAt: Date.now(),
         })
-    }
-})
-
-export const updateCart = mutation({
-    args: {
-        sessionId: v.string(),
-        menuItemId: v.id("menu_items"),
-        quantity: v.number(),
-        itemName: v.string(),
-        itemPrice: v.number()
-    },
-    handler: async (ctx, args) => {
-        const item =
-            await ctx.db
-            .query("cart")
-            .withIndex("by_session_item", (q) => q.eq("sessionId", args.sessionId).eq("menuItemId", args.menuItemId))
-            .first();
-
-        if (!item) {
-            await ctx.db.insert("cart", {
-                ...args,
-                addedAt: Date.now()
-            })
-        } else {
-            await ctx.db.patch(item._id, {
-                quantity: args.quantity,
-                addedAt: Date.now()
-            })
-        }
     }
 })
