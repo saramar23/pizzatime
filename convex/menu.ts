@@ -2,8 +2,7 @@ import { query } from "./_generated/server"
 import { v } from "convex/values"
 import { dietaryTagValidator, menuCategoryValidator } from "./schema"
 
-// ─── Get all available menu items ─────────────────────────────────────────────
-export const getAll = query({
+export const getAllMenuItems = query({
   args: {},
   handler: async (ctx) => {
     return await ctx.db
@@ -13,7 +12,6 @@ export const getAll = query({
   },
 })
 
-// ─── Get items by category ────────────────────────────────────────────────────
 export const getByCategory = query({
   args: {
     category: menuCategoryValidator,
@@ -27,7 +25,7 @@ export const getByCategory = query({
   },
 })
 
-// ─── Get featured items (daily specials / chef picks) ─────────────────────────
+
 export const getFeatured = query({
   args: {},
   handler: async (ctx) => {
@@ -39,7 +37,7 @@ export const getFeatured = query({
   },
 })
 
-// ─── Get most popular items ───────────────────────────────────────────────────
+// Get most popular items
 // Returns top N items sorted by popularity score (0–100)
 export const getPopular = query({
   args: {
@@ -58,8 +56,7 @@ export const getPopular = query({
   },
 })
 
-// ─── Get single item by ID ────────────────────────────────────────────────────
-export const getById = query({
+export const getItemById = query({
   args: {
     id: v.id("menu_items"),
   },
@@ -68,8 +65,7 @@ export const getById = query({
   },
 })
 
-// ─── Search menu by name ──────────────────────────────────────────────────────
-export const search = query({
+export const searchMenu = query({
   args: {
     searchTerm: v.string(),
   },
@@ -83,7 +79,6 @@ export const search = query({
   },
 })
 
-// ─── Get shareable items ──────────────────────────────────────────────────────
 export const getShareable = query({
   args: {},
   handler: async (ctx) => {
@@ -99,9 +94,7 @@ export const getShareable = query({
   },
 })
 
-// ─── Get items by dietary tag ─────────────────────────────────────────────────
-// Used by the agent to filter e.g. vegetarian or gluten-free options
-export const getByDietary = query({
+export const getByDietaryTag = query({
   args: {
     tag: dietaryTagValidator,
   },
