@@ -6,7 +6,7 @@ export const getCart = query({
         sessionId: v.string(),
     },
     handler: async (ctx, args) => {
-        return ctx.db
+        return await ctx.db
             .query("cart")
             .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
             .collect()
@@ -22,6 +22,14 @@ export const addToCart = mutation({
         itemPrice: v.number()
     },
     handler: async (ctx, args) => {
+        const inventory = await ctx.db
+            .query("inventory")
+            .withIndex("by_menuItem", (q) => q.eq("menuItemId", args.menuItemId))
+            .first()
+
+        if (!inventory || inventory.stock < args.quantity) {
+            throw new Error("Not enough stock available.")
+        }
         const item =
             await ctx.db
                 .query("cart")
@@ -80,10 +88,10 @@ export const clearCart = mutation({
                 .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
                 .collect();
 
-        if (item.length === 0) { 
-            return; 
+        if (item.length === 0) {
+            return;
         }
-        
+
         for (const cartItem of item) {
             await ctx.db.delete(cartItem._id)
         }

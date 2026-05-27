@@ -13,7 +13,7 @@ export const getItemStockById = query({
     }
 })
 
-export const getLowStock = query({
+export const getLowStockItem = query({
     args: {},
     handler: async (ctx) => {
         const item =
@@ -25,7 +25,7 @@ export const getLowStock = query({
     },
 })
 
-export const updateStock = mutation({
+export const updateItemStock = mutation({
     args: {
         menuItemId: v.id("menu_items"),
         quantity: v.number()
