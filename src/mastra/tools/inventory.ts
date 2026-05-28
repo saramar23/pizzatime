@@ -12,7 +12,7 @@ export const checkItemStock = createTool({
     }),
     execute: async ({ menuItemId }) => {
         const itemStock = await fetchQuery(api.inventory.getItemStockById, { 
-            menuItemId: menuItemId  as Id<"menu_items">
+            menuItemId: menuItemId as Id<"menu_items">
         })
         return itemStock
     }

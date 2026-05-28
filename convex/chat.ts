@@ -1,14 +1,3 @@
-// chat_history: defineTable({
-//     sessionId: v.string(),
-//     role: chatRoleValidator,
-//     content: v.string(),
-//     toolCalls: v.optional(v.string()),        // JSON string of tool call log
-//     createdAt: v.number(),
-//   })
-//     .index("by_session", ["sessionId"])
-//     .index("by_session_time", ["sessionId", "createdAt"]),
-// })
-
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { chatRoleValidator } from "./schema";
