@@ -1,7 +1,7 @@
 import { defineSchema, defineTable } from "convex/server"
 import { v } from "convex/values"
 
-// ─── Shared validators (reuse across queries/mutations) ───────────────────────
+// Shared validators 
 
 export const dietaryTagValidator = v.union(
   v.literal("vegetarian"),
@@ -36,15 +36,14 @@ export const menuCategoryValidator = v.union(
   v.literal("special")
 )
 
-// ─── Schema ───────────────────────────────────────────────────────────────────
+// Schema 
 
 export default defineSchema({
-  // ── menu_items ──────────────────────────────────────────────────────────────
   // Source of truth for everything on the menu.
   menu_items: defineTable({
     name: v.string(),
     description: v.string(),
-    price: v.number(),                        // in dollars, e.g. 12.99
+    price: v.number(),                        // in dollars
     category: menuCategoryValidator,
     imageUrl: v.optional(v.string()),
 
@@ -75,11 +74,11 @@ export default defineSchema({
       filterFields: ["category", "isAvailable"],
     }),
 
-  // ── inventory ───────────────────────────────────────────────────────────────
+  // inventory 
   // Tracks real-time stock levels. One row per menu_item.
   inventory: defineTable({
     menuItemId: v.id("menu_items"),
-    stock: v.number(),                        // current units available
+    stock: v.number(),                        
     lowStockThreshold: v.number(),            // warn agent when stock <= this
     soldToday: v.number(),                    // reset daily via cron
     updatedAt: v.number(),                    // Date.now() on each write
@@ -87,7 +86,7 @@ export default defineSchema({
     .index("by_menuItem", ["menuItemId"])
     .index("by_stock", ["stock"]),
 
-  // ── cart ────────────────────────────────────────────────────────────────────
+  // cart 
   // Per-session cart. sessionId = anonymous ID from the chatbot widget.
   cart: defineTable({
     sessionId: v.string(),
@@ -101,7 +100,7 @@ export default defineSchema({
     .index("by_session", ["sessionId"])
     .index("by_session_item", ["sessionId", "menuItemId"]),
 
-  // ── orders ──────────────────────────────────────────────────────────────────
+  // orders 
   // Placed orders (cart → order on checkout).
   orders: defineTable({
     sessionId: v.string(),
@@ -124,7 +123,7 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_status_created", ["status", "createdAt"]),
 
-  // ── chat_history ─────────────────────────────────────────────────────────────
+  // chat_history 
   // Stores every message for each session (used by Mastra memory + UI replay).
   chat_history: defineTable({
     sessionId: v.string(),
