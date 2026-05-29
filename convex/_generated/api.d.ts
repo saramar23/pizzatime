@@ -10,9 +10,11 @@
 
 import type * as cart from "../cart.js";
 import type * as chat from "../chat.js";
+import type * as data_menuItems from "../data/menuItems.js";
 import type * as inventory from "../inventory.js";
 import type * as menu from "../menu.js";
 import type * as orders from "../orders.js";
+import type * as seed from "../seed.js";
 
 import type {
   ApiFromModules,
@@ -23,9 +25,11 @@ import type {
 declare const fullApi: ApiFromModules<{
   cart: typeof cart;
   chat: typeof chat;
+  "data/menuItems": typeof data_menuItems;
   inventory: typeof inventory;
   menu: typeof menu;
   orders: typeof orders;
+  seed: typeof seed;
 }>;
 
 /**
