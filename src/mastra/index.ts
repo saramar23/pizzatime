@@ -6,6 +6,6 @@ export const mastra = new Mastra({
   agents: { restaurantAgent },
   logger: new PinoLogger({
     name: 'Mastra',
-    level: 'info',
+    level: 'warn',
   }),
 });
