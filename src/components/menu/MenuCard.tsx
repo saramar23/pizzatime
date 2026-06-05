@@ -1,4 +1,4 @@
-import { Doc } from "../../../convex/_generated/dataModel";
+import { Doc, Id } from "../../../convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 
@@ -17,7 +17,12 @@ function categoryEmoji(category: Doc<"menu_items">["category"]) {
   }
 }
 
-export function MenuCard({ item }: { item: Doc<"menu_items"> }) {
+interface MenuCardProps {
+  item: Doc<"menu_items">
+  onAdd: (menuItemId: Id<"menu_items">, itemName: string, itemPrice: number) => void
+}
+
+export function MenuCard({ item, onAdd }: MenuCardProps) {
   return (
     <article className="group relative cursor-pointer overflow-hidden rounded-xl border border-crema/7 bg-crema-dark transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-gold/35">
       {item.isFeatured && (
@@ -49,6 +54,7 @@ export function MenuCard({ item }: { item: Doc<"menu_items"> }) {
             className={cn(
               "h-auto rounded-md border-none bg-rosso px-3 py-1 text-[0.78rem] font-medium text-crema transition-colors hover:bg-rosso-dark",
             )}
+            onClick={() => onAdd(item._id, item.name, item.price)}
           >
             + Add
           </Button>

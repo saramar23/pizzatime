@@ -5,6 +5,7 @@ import { Providers } from "./providers";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Nav } from "@/components/layout/Nav";
+import { PageClient } from "@/components/layout/PageClient";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
@@ -36,7 +37,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>
-          <Header />
+          <PageClient />
           {children}
           <Footer/>
         </Providers>

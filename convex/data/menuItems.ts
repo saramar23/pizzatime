@@ -3,7 +3,7 @@ export const menuItems = [
     {
         name: "Margherita",
         description: "Classic tomato sauce, fresh mozzarella, and basil.",
-        price: 13.99,
+        price: 14,
         category: "pizza" as const,
         calories: 850,
         protein: 32,
@@ -20,7 +20,7 @@ export const menuItems = [
     {
         name: "Salami Inferno",
         description: "Double spicy italian salami, spicy marinara sauce, and smoked mozzarella.",
-        price: 16.99,
+        price: 17,
         category: "pizza" as const,
         calories: 1100,
         protein: 48,
@@ -37,7 +37,7 @@ export const menuItems = [
     {
         name: "Quattro Formaggi",
         description: "Mozzarella, gorgonzola, fontina, and grana padano cheese on a white base.",
-        price: 16.99,
+        price: 17,
         category: "pizza" as const,
         calories: 1050,
         protein: 46,
@@ -54,7 +54,7 @@ export const menuItems = [
     {
         name: "Veggie Garden",
         description: "Roasted peppers, zucchini, mushrooms, olives, and provola cheese.",
-        price: 15.99,
+        price: 16,
         category: "pizza" as const,
         calories: 780,
         protein: 28,
@@ -71,7 +71,7 @@ export const menuItems = [
     {
         name: "The Big Slice",
         description: "Our largest pizza — 18 inches of pure cheese, ham, sausage and mushrooms.",
-        price: 28.99,
+        price: 29,
         category: "pizza" as const,
         calories: 2200,
         protein: 88,
@@ -90,7 +90,7 @@ export const menuItems = [
     {
         name: "San Pellegrino",
         description: "Sparkling mineral water, 500ml bottle.",
-        price: 3.49,
+        price: 4,
         category: "drink" as const,
         calories: 0,
         protein: 0,
@@ -107,7 +107,7 @@ export const menuItems = [
     {
         name: "Fresh Lemonade",
         description: "House-made lemonade with mint and a touch of honey.",
-        price: 4.99,
+        price: 5,
         category: "drink" as const,
         calories: 180,
         protein: 0,
@@ -124,7 +124,7 @@ export const menuItems = [
     {
         name: "Coke / Diet Coke",
         description: "330ml can. Ask for regular or diet.",
-        price: 2.99,
+        price: 3,
         category: "drink" as const,
         calories: 140,
         protein: 0,
@@ -143,7 +143,7 @@ export const menuItems = [
     {
         name: "Peroni Nastro Azzurro",
         description: "Italian lager, crisp and refreshing. 330ml bottle.",
-        price: 6.99,
+        price: 7,
         category: "beer" as const,
         calories: 148,
         protein: 1,
@@ -160,7 +160,7 @@ export const menuItems = [
     {
         name: "Local IPA",
         description: "Rotating local craft IPA on tap. Ask your server for today's selection.",
-        price: 8.99,
+        price: 9,
         category: "beer" as const,
         calories: 210,
         protein: 2,
@@ -177,7 +177,7 @@ export const menuItems = [
     {
         name: "Moretti",
         description: "Classic Italian lager. Light and smooth. 330ml bottle.",
-        price: 6.49,
+        price: 7,
         category: "beer" as const,
         calories: 132,
         protein: 1,
@@ -196,7 +196,7 @@ export const menuItems = [
     {
         name: "Tiramisu",
         description: "Classic Italian tiramisu with mascarpone, espresso, and cocoa. Serves 2.",
-        price: 9.99,
+        price: 10,
         category: "dessert" as const,
         calories: 620,
         protein: 10,
@@ -213,7 +213,7 @@ export const menuItems = [
     {
         name: "Nutella Pizza",
         description: "Mini dessert pizza with Nutella, strawberries, and powdered sugar.",
-        price: 8.99,
+        price: 9,
         category: "dessert" as const,
         calories: 740,
         protein: 12,
@@ -230,7 +230,7 @@ export const menuItems = [
     {
         name: "Panna Cotta",
         description: "Vanilla panna cotta with mixed berry compote.",
-        price: 7.99,
+        price: 8,
         category: "dessert" as const,
         calories: 420,
         protein: 6,
@@ -249,7 +249,7 @@ export const menuItems = [
     {
         name: "Pizza + Beer Combo",
         description: "Any medium pizza + 2 beers of your choice. Today's special deal.",
-        price: 24.99,
+        price: 25,
         category: "special" as const,
         calories: 1300,
         protein: 52,

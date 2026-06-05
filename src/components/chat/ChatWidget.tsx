@@ -24,7 +24,6 @@ export function ChatWidget() {
   ])
   const [isLoading, setIsLoading] = useState(false)
 
-  // Generates a session ID for this browser session
   const sessionId = useSessionId();
 
   const sendMessage = async (content: string) => {
