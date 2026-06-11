@@ -20,9 +20,11 @@ function categoryEmoji(category: Doc<"menu_items">["category"]) {
 interface MenuCardProps {
   item: Doc<"menu_items">
   onAdd: (menuItemId: Id<"menu_items">, itemName: string, itemPrice: number) => void
+  cartQuantity: number;
 }
 
-export function MenuCard({ item, onAdd }: MenuCardProps) {
+export function MenuCard({ item, onAdd, cartQuantity }: MenuCardProps) {
+
   return (
     <article className="group relative cursor-pointer overflow-hidden rounded-xl border border-crema/7 bg-crema-dark transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-gold/35">
       {item.isFeatured && (
@@ -33,8 +35,8 @@ export function MenuCard({ item, onAdd }: MenuCardProps) {
       <div className="flex h-[140px] items-center justify-center border-b border-crema/5 bg-[linear-gradient(135deg,#2A1508,#1A1008)]">
         <span className="text-5xl">{categoryEmoji(item.category)}</span>
       </div>
-      <div className="p-4">
-        <div className="mb-1.5 flex items-start justify-between gap-2">
+      <div className="p-4 flex flex-col h-36">
+        <div className="mb-1.5 flex items-start justify-between gap-2 ">
           <h3 className="font-playfair text-base leading-snug font-bold text-carbone">
             {item.name}
           </h3>
@@ -45,19 +47,26 @@ export function MenuCard({ item, onAdd }: MenuCardProps) {
         <p className="mb-3 text-[0.8rem] leading-normal text-carbone">
           {item.description}
         </p>
-        <div className="flex items-center justify-between">
+        <div className="flex mt-auto items-center justify-between">
           <span className="text-[0.72rem] font-light text-carbone">
             {item.calories} kcal
           </span>
-          <Button
-            size="sm"
-            className={cn(
-              "h-auto rounded-md border-none bg-rosso px-3 py-1 text-[0.78rem] font-medium text-crema transition-colors hover:bg-rosso-dark",
+          <div className="relative">
+            {cartQuantity > 0 && (
+              <span className="absolute -top-2 -right-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-gold/80 text-[0.8rem] font-bold text-carbone">
+                {cartQuantity}
+              </span>
             )}
-            onClick={() => onAdd(item._id, item.name, item.price)}
-          >
-            + Add
-          </Button>
+            <Button
+              size="sm"
+              className={cn(
+                "h-auto rounded-md border-none bg-rosso px-3 py-1 text-[0.78rem] font-medium text-crema transition-colors hover:bg-rosso-dark",
+              )}
+              onClick={() => onAdd(item._id, item.name, item.price)}
+            >
+              + Add
+            </Button>
+          </div>
         </div>
       </div>
     </article>

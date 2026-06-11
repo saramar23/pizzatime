@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Nav } from "@/components/layout/Nav";
 import { PageClient } from "@/components/layout/PageClient";
 
 const playfairDisplay = Playfair_Display({
@@ -35,11 +33,13 @@ export default function RootLayout({
       lang="en"
       className={`${playfairDisplay.variable} ${dmSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <Providers>
-          <PageClient />
-          {children}
-          <Footer/>
+          <div className="flex-1">
+            <PageClient />
+            {children}
+          </div>
+          <Footer />
         </Providers>
       </body>
     </html>

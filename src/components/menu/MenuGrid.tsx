@@ -1,21 +1,20 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useState } from "react";
 import { MenuCard } from "./MenuCard";
 import { MenuCardSkeleton } from "./MenuCardSkeleton";
 import { CategoryNav } from "./CategoryNav";
 import type { Category } from "@/types/types";
-import { useSessionId } from "@/hooks/useSessionId";
-import { Id } from "../../../convex/_generated/dataModel";
+import { useCart } from "@/hooks/useCart";
 
 const SKELETON_COUNT = 6;
 
 export function MenuGrid() {
   const menuList = useQuery(api.menu.getAllMenuItems);
   const isLoading = menuList === undefined;
-  const [activeCategory, setActiveCategory] = useState<Category>("all");
+  const [ activeCategory, setActiveCategory ] = useState<Category>("all");  
 
   const items = menuList ?? [];
   const filtered =
@@ -23,13 +22,7 @@ export function MenuGrid() {
       ? items
       : items.filter((i) => i.category === activeCategory);
 
-  const addToCart = useMutation(api.cart.addToCart);
-  const sessionId = useSessionId();
-
-  const handleAddToCart = async (menuItemId: Id<"menu_items">, itemName: string, itemPrice: number) => {
-    if (!sessionId) return
-    await addToCart({ sessionId, menuItemId, quantity: 1, itemName, itemPrice })
-  }
+  const { handleAdd, cartItems } = useCart();
 
   return (
     <>
@@ -56,7 +49,8 @@ export function MenuGrid() {
                 <MenuCard
                   key={item._id}
                   item={item}
-                  onAdd={handleAddToCart} 
+                  cartQuantity={cartItems?.find(c => c.menuItemId === item._id)?.quantity ?? 0}
+                  onAdd={(menuItemId, itemName, itemPrice) => handleAdd(menuItemId, 1, itemName, itemPrice)}
                 />
               ))}
         </div>
