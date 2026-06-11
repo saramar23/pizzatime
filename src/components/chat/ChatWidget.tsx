@@ -22,7 +22,7 @@ export function ChatWidget() {
       content: "Ciao! 👋 I'm Slice, your PizzaTime assistant. I can help you explore the menu, check calories, manage your cart, and estimate wait times. What can I get you?",
     },
   ])
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const sessionId = useSessionId();
 
@@ -60,12 +60,12 @@ export function ChatWidget() {
       }
       setMessages(prev => [...prev, assistantMessage])
 
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
 
       while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+        const { done, value } = await reader.read();
+        if (done) break;
 
         const chunk = decoder.decode(value, { stream: true })
         setMessages(prev =>

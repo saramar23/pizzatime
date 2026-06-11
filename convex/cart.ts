@@ -43,7 +43,7 @@ export const addToCart = mutation({
             })
         } else {
             await ctx.db.patch(item._id, {
-                quantity: args.quantity,
+                quantity: item.quantity + args.quantity,
                 addedAt: Date.now()
             })
         }
