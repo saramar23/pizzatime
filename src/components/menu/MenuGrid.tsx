@@ -31,7 +31,7 @@ export function MenuGrid() {
         onCategoryChange={setActiveCategory}
       />
       <section className="mx-auto max-w-[1200px] p-8">
-        <p className="mb-6 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-gold">
+        <p className="mb-6 font-medium uppercase tracking-[0.18em] text-gold">
           Our Menu
         </p>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">

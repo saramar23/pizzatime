@@ -95,7 +95,7 @@ export function ChatWidget() {
       <button
         type="button"
         className={cn(
-          "fixed bottom-6 right-6 z-[100] flex size-14 cursor-pointer items-center justify-center rounded-full border-none bg-rosso text-crema",
+          "fixed bottom-22 right-10 z-[100] flex size-14 cursor-pointer items-center justify-center rounded-full border-none bg-rosso text-crema",
           "shadow-[0_4px_20px_rgba(196,30,30,0.4)] transition-[transform,box-shadow] duration-200",
           "hover:scale-[1.08] hover:shadow-[0_6px_28px_rgba(196,30,30,0.5)]"
         )}
@@ -107,7 +107,7 @@ export function ChatWidget() {
 
       <div
         className={cn(
-          "fixed bottom-20 right-6 z-[99] flex h-[520px] w-[360px] flex-col overflow-hidden rounded-2xl bg-crema",
+          "fixed bottom-40 right-10 z-[99] flex h-[520px] w-[360px] flex-col overflow-hidden rounded-2xl bg-crema",
           "origin-bottom-right shadow-[0_8px_48px_rgba(0,0,0,0.35)] transition-[transform,opacity] duration-250 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
           isOpen
             ? "scale-100 opacity-100"
