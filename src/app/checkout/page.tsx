@@ -1,59 +1,144 @@
 "use client"
 
+import { CheckoutShell } from "@/components/checkout/CheckoutShell";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/useCart";
-import { Loader2 } from "lucide-react";
+import { useSessionId } from "@/hooks/useSessionId";
+import { useMutation } from "convex/react";
+import { ArrowRight, Loader2, Pizza } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { api } from "../../../convex/_generated/api";
+import { Id } from "../../../convex/_generated/dataModel";
+
+type CheckoutStep = "summary" | "processing" | "confirmed";
 
 export default function Checkout() {
-    const { cartItems, subtotal } = useCart();
+    const { cartItems, subtotal, handleClear } = useCart();
+    const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("summary");
+    const sessionId = useSessionId();
+    const createOrder = useMutation(api.orders.createOrder);
+    const [error, setError] = useState<string | null>(null);
+    const [orderId, setOrderId] = useState<Id<"orders"> | null>(null);
+    const [waitTime, setWaitTime] = useState<number>(15);
 
-    return (
-        <>
-            {cartItems === undefined ?
-                (
-                    <div className="flex flex-col items-center justify-center text-gold mx-auto max-w-md px-4 py-12 space-y-3">
-                        <p className="text-xl" role="status" aria-live="polite">Loading cart...</p>
-                        <Loader2 size={36} className="animate-spin" aria-hidden="true" />
-                    </div>
-                ) : cartItems.length === 0 ?
-                    (
-                        <div className="flex flex-col items-center justify-center mx-auto max-w-md px-4 py-12 space-y-3">
-                            <h2 className="text-3xl mb-6 font-bold uppercase">Cart</h2>
-                            <p>Your cart is empty.</p>
-                            <Link href="/" className="bg-rosso p-2 rounded">Order here</Link>
-                        </div>
-                    ) :
-                    (
-                        <div className="p-2">
-                            <div className="mx-auto max-w-md px-4 py-12">
-                                <h1 className="font-playfair text-2xl font-bold text-crema mb-6">Order Summary</h1>
-                                <ul className="space-y-3">
-                                    {cartItems.map(item => (
-                                        <li key={item._id} className="flex items-center justify-between bg-crema/10 rounded-xl px-4 py-3">
-                                            <div>
-                                                <p className="text-crema font-medium text-sm">{item.itemName}</p>
-                                                <p className="text-crema text-sm">x{item.quantity}</p>
-                                            </div>
-                                            <p className="text-gold font-semibold text-sm">${(item.itemPrice * item.quantity).toFixed(2)}</p>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <div className="flex items-center justify-between bg-crema rounded-xl px-4 py-3 my-3">
-                                    <span className="text-carbone font-bold text-lg">Subtotal</span>
-                                    <span className="text-carbone font-bold text-lg">${subtotal.toFixed(2)}</span>
-                                </div>
-                                <Button
-                                    type="button"
-                                    variant="default"
-                                    className="w-full h-12 bg-rosso text-crema rounded-xl py-3 font-semibold text-md hover:bg-rosso-dark transition-colors"
-                                >
-                                    Place order
-                                </Button>
+
+    const handlePlaceOrder = async () => {
+        setError(null);
+        if (!sessionId || cartItems === undefined || cartItems.length === 0) return;
+        setCheckoutStep("processing");
+        const items = cartItems.map(item => {
+            return {
+                menuItemId: item.menuItemId,
+                name: item.itemName,
+                quantity: item.quantity,
+                priceEach: item.itemPrice
+            }
+        })
+
+        try {
+            const result = await createOrder({
+                items,
+                sessionId,
+                subtotal,
+                estimatedWaitMinutes: waitTime,
+            })
+            setOrderId(result.orderId);
+            setWaitTime(result.estimatedWaitMinutes);
+            handleClear();
+            setCheckoutStep("confirmed");
+        } catch (err: unknown) {
+            setError("Oops, something went wrong. Couldn't place your order. Please try again.");
+            setCheckoutStep("summary");
+        }
+    }
+
+
+    // Loading cart
+    if (!sessionId || cartItems === undefined) return (
+        <CheckoutShell>
+            <div className="flex flex-col justify-center items-center px-4 py-12">
+                <p className="text-xl" role="status" aria-live="polite">Loading cart...</p>
+                <Loader2 size={22} className="animate-spin" aria-hidden="true" />
+            </div>
+        </CheckoutShell>
+    )
+
+    // Processing order
+    if (checkoutStep === "processing") return (
+        <CheckoutShell>
+            <div className="flex flex-col justify-center items-center space-y-3">
+                <h2 className="text-xl font-bold">In progress</h2>
+                <p>Processing your order...</p>
+                <Loader2 size={22} className="animate-spin" aria-hidden="true" />
+            </div>
+        </CheckoutShell>
+    )
+
+    // Order confirmed
+    if (checkoutStep === "confirmed") return (
+        <CheckoutShell>
+            <div className="flex flex-col justify-center items-center">
+                <h2 className="text-xl font-bold">Order confirmed!</h2>
+                <p className="font-bold">Order number:
+                    <span className="font-light px-2">{orderId}</span> 
+                </p>
+                <p className="font-bold">Estimated wait time: 
+                    <span className="font-light px-2">{waitTime} minutes</span>
+                </p>
+                <Link href="/" className="flex items-center text-crema bg-rosso p-2 my-2 rounded">
+                    Place a new order
+                    <Pizza aria-hidden="true" size={20} className="ml-2"/>
+                </Link>
+            </div>
+        </CheckoutShell>
+    )
+
+    // Empty cart
+    if (cartItems.length === 0) return (
+        <CheckoutShell>
+            <div className="flex flex-col justify-center items-center space-y-3">
+                <h2 className="text-3xl mb-12 font-bold uppercase">Cart</h2>
+                <p>Your cart is empty.</p>
+                <Link href="/" className="flex items-center text-crema bg-rosso p-2 rounded">
+                    Order here
+                    <span className="ml-2">
+                        <ArrowRight aria-hidden="true" size={20} className="animate-pulse" />
+                    </span>
+                </Link>
+            </div>
+        </CheckoutShell>
+    )
+
+    if (checkoutStep === "summary") return (
+        <CheckoutShell>
+            <div className="p-2 w-full px-6">
+                <h1 className="font-playfair text-center text-2xl font-bold mb-6 py-3">Order Summary</h1>
+                {error && <p role="alert" className="bg-rosso rounded-xl text-crema p-2 my-2">{error}</p>}
+                <ul className="space-y-3">
+                    {cartItems.map(item => (
+                        <li key={item._id} className="flex items-center justify-between bg-crema rounded-xl px-4 py-3">
+                            <div>
+                                <p className="font-medium">{item.itemName}</p>
+                                <p className="text-sm">x{item.quantity}</p>
                             </div>
-                        </div>
-                    )
-                }
-        </>
+                            <p className="text-gold font-semibold">${(item.itemPrice * item.quantity).toFixed(2)}</p>
+                        </li>
+                    ))}
+                </ul>
+                <div className="flex items-center justify-between px-4 py-3 my-3">
+                    <span className=" text-lg">Subtotal</span>
+                    <span className="font-semibold text-lg">${subtotal.toFixed(2)}</span>
+                </div>
+                <Button
+                    type="button"
+                    variant="default"
+                    className="w-full h-12 bg-rosso text-crema rounded-xl py-3 mt-6 font-semibold text-md hover:bg-rosso-dark transition-colors"
+                    onClick={handlePlaceOrder}
+                >
+                    Place order
+                </Button>
+            </div>
+        </CheckoutShell>
     )
 }

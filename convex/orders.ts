@@ -18,12 +18,31 @@ export const createOrder = mutation({
         subtotal: v.number()
     },
     handler: async (ctx, args) => {
-        await ctx.db.insert("orders", {
+        const orderId = await ctx.db.insert("orders", {
             ...args,
             createdAt: Date.now(),
             updatedAt: Date.now(),
             status: "pending"
-        })
+        });
+
+        for (const item of args.items) {
+            const inventory = await ctx.db
+                .query("inventory")
+                .withIndex("by_menuItem", (q) => q.eq("menuItemId", item.menuItemId))
+                .first();
+
+            if (!inventory || inventory.stock < item.quantity) {
+                throw new Error(`Not enough stock for ${item.name}.`);
+            }
+            
+            await ctx.db.patch(inventory._id, {
+                stock: inventory.stock - item.quantity,
+                soldToday: inventory.soldToday + item.quantity,
+                updatedAt: Date.now(),
+            });
+            
+        }
+        return { estimatedWaitMinutes: args.estimatedWaitMinutes, orderId };
     }
 })
 

@@ -28,6 +28,6 @@
 
 @layer base {
   body {
-    @apply bg-carbone font-dmsans text-crema antialiased;
+    @apply bg-crema font-dmsans text-carbone antialiased;
   }
 }

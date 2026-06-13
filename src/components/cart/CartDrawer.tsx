@@ -33,7 +33,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         ${isOpen ? "translate-x-0" : "translate-x-full"}
       `}>
         {/* Header */}
-        <div className="bg-rosso px-5 py-4 flex items-center justify-between flex-shrink-0">
+        <div className="text-crema bg-rosso px-5 py-4 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2">
             <ShoppingCart size={20} />
             <h2 className="font-semibold text-base">
