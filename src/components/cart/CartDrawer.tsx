@@ -65,7 +65,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <div className="flex-1 min-w-0">
                     <p className="text-carbone font-medium text-sm truncate">{item.itemName}</p>
                     <p className="text-gold text-sm font-medium mt-0.5">
-                      ${item.itemPrice.toFixed(2)} each
+                      ${item.itemPrice} each
                     </p>
                   </div>
                   <button
@@ -96,7 +96,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     </button>
                   </div>
                   <p className="text-carbone font-semibold text-sm">
-                    ${(item.itemPrice * item.quantity).toFixed(2)}
+                    ${(item.itemPrice * item.quantity)}
                   </p>
                 </div>
               </div>
@@ -109,7 +109,7 @@ export function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           <div className="border-t border-black/08 px-4 py-4 space-y-3 flex-shrink-0 bg-crema">
             <div className="flex items-center justify-between">
               <span className="text-carbone/60 text-sm">Subtotal</span>
-              <span className="text-carbone font-bold text-lg">${subtotal.toFixed(2)}</span>
+              <span className="text-carbone font-bold text-lg">${subtotal}</span>
             </div>
             <Link href={"/checkout"}
               className="py-3 block text-center w-full bg-rosso text-crema rounded-xl font-semibold text-sm hover:bg-rosso-dark transition-colors"

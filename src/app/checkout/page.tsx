@@ -122,13 +122,13 @@ export default function Checkout() {
                                 <p className="font-medium">{item.itemName}</p>
                                 <p className="text-sm">x{item.quantity}</p>
                             </div>
-                            <p className="text-gold font-semibold">${(item.itemPrice * item.quantity).toFixed(2)}</p>
+                            <p className="text-gold font-semibold">${(item.itemPrice * item.quantity)}</p>
                         </li>
                     ))}
                 </ul>
                 <div className="flex items-center justify-between px-4 py-3 my-3">
                     <span className=" text-lg">Subtotal</span>
-                    <span className="font-semibold text-lg">${subtotal.toFixed(2)}</span>
+                    <span className="font-semibold text-lg">${subtotal}</span>
                 </div>
                 <Button
                     type="button"

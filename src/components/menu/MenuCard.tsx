@@ -32,8 +32,10 @@ export function MenuCard({ item, onAdd, cartQuantity }: MenuCardProps) {
           Today&apos;s Pick
         </span>
       )}
-      <div className="flex h-[140px] items-center justify-center border-b border-crema/5 bg-[linear-gradient(135deg,#2A1508,#1A1008)]">
-        <span className="text-5xl">{categoryEmoji(item.category)}</span>
+      <div className="flex items-center justify-center aspect-video border-crema/5 ">
+        {item.imageUrl ? (<img src={item.imageUrl} alt={item.description} className="object-cover w-full h-full"/>) : 
+          (<span>{categoryEmoji(item.category)}</span>)
+        }
       </div>
       <div className="p-4 flex flex-col h-36">
         <div className="mb-1.5 flex items-start justify-between gap-2 ">
@@ -41,7 +43,7 @@ export function MenuCard({ item, onAdd, cartQuantity }: MenuCardProps) {
             {item.name}
           </h3>
           <span className="font-dmsans text-base font-medium whitespace-nowrap text-gold">
-            ${item.price.toFixed(2)}
+            ${item.price}
           </span>
         </div>
         <p className="mb-3 text-[0.8rem] leading-normal text-carbone">

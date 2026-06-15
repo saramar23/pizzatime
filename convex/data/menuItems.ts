@@ -3,6 +3,7 @@ export const menuItems = [
     {
         name: "Margherita",
         description: "Classic tomato sauce, fresh mozzarella, and basil.",
+        imageUrl: "/images/margherita.png",
         price: 14,
         category: "pizza" as const,
         calories: 850,
@@ -20,7 +21,8 @@ export const menuItems = [
     {
         name: "Salami Inferno",
         description: "Double spicy italian salami, spicy marinara sauce, and smoked mozzarella.",
-        price: 17,
+        imageUrl: "/images/salami-inferno.png",
+        price: 18,
         category: "pizza" as const,
         calories: 1100,
         protein: 48,
@@ -37,7 +39,8 @@ export const menuItems = [
     {
         name: "Quattro Formaggi",
         description: "Mozzarella, gorgonzola, fontina, and grana padano cheese on a white base.",
-        price: 17,
+        imageUrl: "/images/quattro-formaggi.png",
+        price: 18,
         category: "pizza" as const,
         calories: 1050,
         protein: 46,
@@ -54,6 +57,7 @@ export const menuItems = [
     {
         name: "Veggie Garden",
         description: "Roasted peppers, zucchini, mushrooms, olives, and provola cheese.",
+        imageUrl: "/images/veggie-garden.png",
         price: 16,
         category: "pizza" as const,
         calories: 780,
@@ -71,6 +75,7 @@ export const menuItems = [
     {
         name: "The Big Slice",
         description: "Our largest pizza — 18 inches of pure cheese, ham, sausage and mushrooms.",
+        imageUrl: "/images/big-slice.png",
         price: 29,
         category: "pizza" as const,
         calories: 2200,
@@ -90,6 +95,7 @@ export const menuItems = [
     {
         name: "San Pellegrino",
         description: "Sparkling mineral water, 500ml bottle.",
+        imageUrl: "/images/san-pellegrino.png",
         price: 4,
         category: "drink" as const,
         calories: 0,
@@ -107,6 +113,7 @@ export const menuItems = [
     {
         name: "Fresh Lemonade",
         description: "House-made lemonade with mint and a touch of honey.",
+        imageUrl: "/images/lemonade.png",
         price: 5,
         category: "drink" as const,
         calories: 180,
@@ -124,6 +131,7 @@ export const menuItems = [
     {
         name: "Coke / Diet Coke",
         description: "330ml can. Ask for regular or diet.",
+        imageUrl: "/images/cola.png",
         price: 3,
         category: "drink" as const,
         calories: 140,
@@ -143,6 +151,7 @@ export const menuItems = [
     {
         name: "Peroni Nastro Azzurro",
         description: "Italian lager, crisp and refreshing. 330ml bottle.",
+        imageUrl: "/images/peroni.png",
         price: 7,
         category: "beer" as const,
         calories: 148,
@@ -160,6 +169,7 @@ export const menuItems = [
     {
         name: "Local IPA",
         description: "Rotating local craft IPA on tap. Ask your server for today's selection.",
+        imageUrl: "/images/ipa.png",
         price: 9,
         category: "beer" as const,
         calories: 210,
@@ -177,6 +187,7 @@ export const menuItems = [
     {
         name: "Moretti",
         description: "Classic Italian lager. Light and smooth. 330ml bottle.",
+        imageUrl: "/images/moretti.png",
         price: 7,
         category: "beer" as const,
         calories: 132,
@@ -196,6 +207,7 @@ export const menuItems = [
     {
         name: "Tiramisu",
         description: "Classic Italian tiramisu with mascarpone, espresso, and cocoa. Serves 2.",
+        imageUrl: "/images/tiramisu.png",
         price: 10,
         category: "dessert" as const,
         calories: 620,
@@ -213,6 +225,7 @@ export const menuItems = [
     {
         name: "Nutella Pizza",
         description: "Mini dessert pizza with Nutella, strawberries, and powdered sugar.",
+        imageUrl: "/images/nutella-pizza.png",
         price: 9,
         category: "dessert" as const,
         calories: 740,
@@ -230,6 +243,7 @@ export const menuItems = [
     {
         name: "Panna Cotta",
         description: "Vanilla panna cotta with mixed berry compote.",
+        imageUrl: "/images/pannacotta.png",
         price: 8,
         category: "dessert" as const,
         calories: 420,
@@ -249,6 +263,7 @@ export const menuItems = [
     {
         name: "Pizza + Beer Combo",
         description: "Any medium pizza + 2 beers of your choice. Today's special deal.",
+        imageUrl: "/images/combo.png",
         price: 25,
         category: "special" as const,
         calories: 1300,
