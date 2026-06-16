@@ -20,13 +20,14 @@ export const getCartItems = createTool({
 
 export const addItemToCart = createTool({
     id: "add-item-to-cart",
-    description: "Adds a specific quantity of an item to the cart. If the item is already in the cart, check the stock quantity and increase current cart quantity up to the stock quantity.",
+    description:
+        "Adds items to the cart. Requires menuItemId, itemName, and itemPrice from searchOnMenu (never guess IDs). quantity is how many to add (e.g. '2 margherita' → quantity: 2) and NEVER above the item's stock quantity. Returns the updated cart.",
     inputSchema: z.object({
         sessionId: z.string(),
         menuItemId: z.string(),
         quantity: z.number(),
         itemName: z.string(),
-        itemPrice: z.number()
+        itemPrice: z.number(),
     }),
     execute: async ({ sessionId, menuItemId, quantity, itemName, itemPrice }) => {
         const addItemQuantity = await fetchMutation(api.cart.addToCart, {
@@ -37,13 +38,15 @@ export const addItemToCart = createTool({
     }
 })
 
+
 export const removeItemFromCart = createTool({
     id: "remove-item-from-cart",
-    description: "Removes a specific quantity of an item from the cart. If quantity matches or exceeds current cart quantity, the item is removed entirely.",
+    description:
+        "Removes items from the cart. Use when the customer changes their mind, wants fewer of an item, or no longer wants something. quantity is how many to remove. Returns the updated cart.",
     inputSchema: z.object({
         sessionId: z.string(),
         menuItemId: z.string(),
-        quantity: z.number()
+        quantity: z.number(),
     }),
     execute: async ({ sessionId, menuItemId, quantity }) => {
         const removeItemQuantity = await fetchMutation(api.cart.removeFromCart, {
@@ -56,14 +59,15 @@ export const removeItemFromCart = createTool({
 
 export const clearEntireCart = createTool({
     id: "clear-cart",
-    description: "Clears the cart entirely. Ask the user if they are sure about the action before clearing the cart.",
+    description:
+        "Removes every item from the cart. Use when the customer changes their mind about the whole order or wants to start over. Returns the updated (empty) cart.",
     inputSchema: z.object({
-        sessionId: z.string()
+        sessionId: z.string(),
     }),
     execute: async ({ sessionId }) => {
         const clearedCart = await fetchMutation(api.cart.clearCart, {
             sessionId
         })
         return clearedCart
-    }
+    },
 })

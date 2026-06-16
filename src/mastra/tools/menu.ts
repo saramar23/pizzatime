@@ -29,7 +29,7 @@ export const getMenuByCategory = createTool({
 
 export const getFeatured = createTool({
     id: "featured-menu",
-    description: "Returns all items listed in the 'featured' section of the menu.",
+    description: "Returns all items listed in the 'featured' section of the menu. Featured items can be called when customers ask for 'what is hot today?', 'what is new today?', 'what is special today?' ",
     inputSchema: z.object({}),
     execute: async () => {
         const featuredItems = await fetchQuery(api.menu.getFeatured)
@@ -53,7 +53,7 @@ export const getPopular = createTool({
 
 export const searchOnMenu = createTool({
     id: "search-menu",
-    description: "Search all available items inside the Menu.",
+    description: "Search menu items by name or keyword. Use when the customer asks about a specific item or wants to order — not for casual compliments about items they can already see.",
     inputSchema: z.object({
         searchTerm: z.string()
     }),
