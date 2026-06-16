@@ -6,7 +6,7 @@ import { Id } from "../../../convex/_generated/dataModel"
 
 export const checkItemStock = createTool({
     id: "item-stock",
-    description: "Check stock for a specific item using its unique id",
+    description: "Check stock for a menu item by id. Use only when the customer wants to order or add to cart — not for browsing or compliments.",
     inputSchema: z.object({
         menuItemId: z.string()
     }),

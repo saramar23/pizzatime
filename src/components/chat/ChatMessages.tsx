@@ -24,7 +24,10 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
         "[scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.1)_transparent]"
       )}
     >
-      {messages.map(msg => (
+      {messages.map(msg => {
+        if (msg.role === "assistant" && !msg.content.trim()) return null
+
+        return (
         <div
           key={msg.id}
           className={cn(
@@ -43,7 +46,8 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
             <ReactMarkdown>{msg.content}</ReactMarkdown>
           </div>
         </div>
-      ))}
+        )
+      })}
 
       {isLoading && (
         <div className="flex items-end gap-2">

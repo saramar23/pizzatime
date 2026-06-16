@@ -27,7 +27,7 @@ export function ChatWidget() {
   const sessionId = useSessionId();
 
   const sendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return
+    if (!content.trim() || isLoading || !sessionId) return
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -142,7 +142,7 @@ export function ChatWidget() {
         <ChatMessages messages={messages} isLoading={isLoading} />
 
         {/* Input */}
-        <ChatInput onSend={sendMessage} isLoading={isLoading} />
+        <ChatInput onSend={sendMessage} isLoading={isLoading || !sessionId} />
       </div>
     </>
   )
