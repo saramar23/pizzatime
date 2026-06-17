@@ -13,7 +13,7 @@ export function CategoryNav({
   onCategoryChange,
 }: CategoryNavProps) {
   return (
-    <nav className="flex justify-center gap-2 overflow-x-auto border-b border-crema/6 bg-carbone p-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <nav className="flex flex-wrap justify-center gap-2 overflow-x-auto border-b border-crema/6 bg-carbone p-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {categories.map((cat) => {
         const isActive = activeCategory === cat.value;
 

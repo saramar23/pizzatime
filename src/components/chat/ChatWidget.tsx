@@ -19,7 +19,8 @@ export function ChatWidget() {
     {
       id: "welcome",
       role: "assistant",
-      content: "Ciao! 👋 I'm Slice, your PizzaTime assistant. I can help you explore the menu, check calories, manage your cart, and estimate wait times. What can I get you?",
+      content:
+        "Ciao! 👋 I'm Slice, your PizzaTime assistant. I can help you explore the menu, check calories, manage your cart, and estimate wait times. What can I get you?",
     },
   ])
   const [isLoading, setIsLoading] = useState(false);
@@ -49,34 +50,64 @@ export function ChatWidget() {
         }),
       })
 
-      if (!res.ok) throw new Error("Failed to get response")
+      if (!res.ok) {
+        const errorText = (await res.text()).trim()
+        setMessages(prev => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content:
+              errorText ||
+              (res.status === 429
+                ? "I'm temporarily unavailable (API rate limit). Try again later."
+                : "Sorry, something went wrong. Please try again!"),
+          },
+        ])
+        return
+      }
+
       if (!res.body) throw new Error("No response body")
 
-      // Bot Response
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: "",
-      }
-      setMessages(prev => [...prev, assistantMessage])
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let assistantMessageId: string | null = null
 
       while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+        const { done, value } = await reader.read()
+        if (done) break
 
         const chunk = decoder.decode(value, { stream: true })
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === assistantMessage.id
-              ? { ...msg, content: msg.content + chunk }
-              : msg
+        if (!chunk) continue
+
+        if (!assistantMessageId) {
+          assistantMessageId = crypto.randomUUID()
+          const id = assistantMessageId
+          setMessages(prev => [
+            ...prev,
+            { id, role: "assistant", content: chunk },
+          ])
+        } else {
+          const id = assistantMessageId
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === id ? { ...msg, content: msg.content + chunk } : msg
+            )
           )
-        )
+        }
       }
-    } catch (err) {
+
+      if (!assistantMessageId) {
+        setMessages(prev => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: "Sorry, I didn't get a response. Please try again.",
+          },
+        ])
+      }
+    } catch {
       setMessages(prev => [
         ...prev,
         {
@@ -95,7 +126,7 @@ export function ChatWidget() {
       <button
         type="button"
         className={cn(
-          "fixed bottom-22 right-10 z-[100] flex size-14 cursor-pointer items-center justify-center rounded-full border-none bg-rosso text-crema",
+          "fixed bottom-10 right-4 z-[98] flex size-12 cursor-pointer items-center justify-center rounded-full border-none bg-rosso text-crema",
           "shadow-[0_4px_20px_rgba(196,30,30,0.4)] transition-[transform,box-shadow] duration-200",
           "hover:scale-[1.08] hover:shadow-[0_6px_28px_rgba(196,30,30,0.5)]"
         )}
@@ -107,8 +138,8 @@ export function ChatWidget() {
 
       <div
         className={cn(
-          "fixed bottom-40 right-10 z-[99] flex h-[520px] w-[360px] flex-col overflow-hidden rounded-2xl bg-crema",
-          "origin-bottom-right shadow-[0_8px_48px_rgba(0,0,0,0.35)] transition-[transform,opacity] duration-250 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+          "fixed w-full h-[80dvh] bottom-0 right-0 z-[99] md:w-100 md:h-120 md:bottom-20 md:right-10 flex flex-col overflow-hidden rounded-2xl bg-crema pb-[env(safe-area-inset-bottom,_16px)]",
+          "origin-bottom-right shadow-[0_8px_48px_rgba(0,0,0,0.35)] transition-[transform,opacity] duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]",
           isOpen
             ? "scale-100 opacity-100"
             : "pointer-events-none scale-[0.85] opacity-0"
@@ -138,10 +169,8 @@ export function ChatWidget() {
           </button>
         </div>
 
-        {/* Messages */}
         <ChatMessages messages={messages} isLoading={isLoading} />
 
-        {/* Input */}
         <ChatInput onSend={sendMessage} isLoading={isLoading || !sessionId} />
       </div>
     </>

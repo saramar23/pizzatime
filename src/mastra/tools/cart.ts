@@ -5,69 +5,71 @@ import z from "zod"
 import { Id } from "../../../convex/_generated/dataModel"
 
 export const getCartItems = createTool({
-    id: "cart-items",
-    description: "Check entire cart content and the quantity for every single item.",
-    inputSchema: z.object({
-        sessionId: z.string()
-    }),
-    execute: async ({ sessionId }) => {
-        const cart = await fetchQuery(api.cart.getCart, {
-            sessionId
-        })
-        return cart
-    }
+  id: "cart-items",
+  description:
+    "Returns the customer's current cart. Use for 'what's in my cart' and always verify cart state before telling the customer what was added or removed.",
+  inputSchema: z.object({
+    sessionId: z.string(),
+  }),
+  execute: async ({ sessionId }) => {
+    return await fetchQuery(api.cart.getCart, { sessionId })
+  },
 })
 
 export const addItemToCart = createTool({
-    id: "add-item-to-cart",
-    description:
-        "Adds items to the cart. Requires menuItemId, itemName, and itemPrice from searchOnMenu (never guess IDs). quantity is how many to add (e.g. '2 margherita' → quantity: 2) and NEVER above the item's stock quantity. Returns the updated cart.",
-    inputSchema: z.object({
-        sessionId: z.string(),
-        menuItemId: z.string(),
-        quantity: z.number(),
-        itemName: z.string(),
-        itemPrice: z.number(),
-    }),
-    execute: async ({ sessionId, menuItemId, quantity, itemName, itemPrice }) => {
-        const addItemQuantity = await fetchMutation(api.cart.addToCart, {
-            sessionId, quantity, itemName, itemPrice,
-            menuItemId: menuItemId as Id<"menu_items">
-        })
-        return addItemQuantity
-    }
+  id: "add-item-to-cart",
+  description:
+    "Adds items to the cart. Requires menuItemId, itemName, and itemPrice from searchOnMenu. quantity is how many to add (e.g. '2 margherita' → quantity: 2). Returns { success, cart }.",
+  inputSchema: z.object({
+    sessionId: z.string(),
+    menuItemId: z.string(),
+    quantity: z.number(),
+    itemName: z.string(),
+    itemPrice: z.number(),
+  }),
+  execute: async ({ sessionId, menuItemId, quantity, itemName, itemPrice }) => {
+    await fetchMutation(api.cart.addToCart, {
+      sessionId,
+      quantity,
+      itemName,
+      itemPrice,
+      menuItemId: menuItemId as Id<"menu_items">,
+    })
+    const cart = await fetchQuery(api.cart.getCart, { sessionId })
+    return { success: true, cart }
+  },
 })
 
-
 export const removeItemFromCart = createTool({
-    id: "remove-item-from-cart",
-    description:
-        "Removes items from the cart. Use when the customer changes their mind, wants fewer of an item, or no longer wants something. quantity is how many to remove. Returns the updated cart.",
-    inputSchema: z.object({
-        sessionId: z.string(),
-        menuItemId: z.string(),
-        quantity: z.number(),
-    }),
-    execute: async ({ sessionId, menuItemId, quantity }) => {
-        const removeItemQuantity = await fetchMutation(api.cart.removeFromCart, {
-            sessionId, quantity,
-            menuItemId: menuItemId as Id<"menu_items">
-        })
-        return removeItemQuantity
-    }
+  id: "remove-item-from-cart",
+  description:
+    "Removes items from the cart. Use when the customer changes their mind or wants fewer of an item. Returns { success, cart }.",
+  inputSchema: z.object({
+    sessionId: z.string(),
+    menuItemId: z.string(),
+    quantity: z.number(),
+  }),
+  execute: async ({ sessionId, menuItemId, quantity }) => {
+    await fetchMutation(api.cart.removeFromCart, {
+      sessionId,
+      quantity,
+      menuItemId: menuItemId as Id<"menu_items">,
+    })
+    const cart = await fetchQuery(api.cart.getCart, { sessionId })
+    return { success: true, cart }
+  },
 })
 
 export const clearEntireCart = createTool({
-    id: "clear-cart",
-    description:
-        "Removes every item from the cart. Use when the customer changes their mind about the whole order or wants to start over. Returns the updated (empty) cart.",
-    inputSchema: z.object({
-        sessionId: z.string(),
-    }),
-    execute: async ({ sessionId }) => {
-        const clearedCart = await fetchMutation(api.cart.clearCart, {
-            sessionId
-        })
-        return clearedCart
-    },
+  id: "clear-cart",
+  description:
+    "Removes every item from the cart. Use when replacing the whole order after a change of mind. Returns { success, cart }.",
+  inputSchema: z.object({
+    sessionId: z.string(),
+  }),
+  execute: async ({ sessionId }) => {
+    await fetchMutation(api.cart.clearCart, { sessionId })
+    const cart = await fetchQuery(api.cart.getCart, { sessionId })
+    return { success: true, cart }
+  },
 })
