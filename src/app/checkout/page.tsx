@@ -4,12 +4,11 @@ import { CheckoutShell } from "@/components/checkout/CheckoutShell";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/useCart";
 import { useSessionId } from "@/hooks/useSessionId";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { ArrowRight, Loader2, Pizza } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
-import { Id } from "../../../convex/_generated/dataModel";
 
 type CheckoutStep = "summary" | "processing" | "confirmed";
 
@@ -19,13 +18,25 @@ export default function Checkout() {
     const sessionId = useSessionId();
     const createOrder = useMutation(api.orders.createOrder);
     const [error, setError] = useState<string | null>(null);
-    const [orderId, setOrderId] = useState<Id<"orders"> | null>(null);
-    const [waitTime, setWaitTime] = useState<number>(15);
+    const [orderNumber, setOrderNumber] = useState<number | null>(null);
+    const [confirmedWaitMinutes, setConfirmedWaitMinutes] = useState<number | null>(null);
 
+    const waitItems =
+        cartItems?.map((item) => ({
+            menuItemId: item.menuItemId,
+            quantity: item.quantity,
+        })
+    ) ?? [];
+
+    const estimatedWaitMinutes = useQuery(
+        api.orders.getEstimatedWaitMinutes,
+        cartItems ? { items: waitItems } : "skip"
+    );
 
     const handlePlaceOrder = async () => {
         setError(null);
         if (!sessionId || cartItems === undefined || cartItems.length === 0) return;
+        if (estimatedWaitMinutes === undefined) return;
         setCheckoutStep("processing");
         const items = cartItems.map(item => {
             return {
@@ -41,10 +52,10 @@ export default function Checkout() {
                 items,
                 sessionId,
                 subtotal,
-                estimatedWaitMinutes: waitTime,
+                estimatedWaitMinutes
             })
-            setOrderId(result.orderId);
-            setWaitTime(result.estimatedWaitMinutes);
+            setOrderNumber(result.orderNumber);
+            setConfirmedWaitMinutes(result.estimatedWaitMinutes);
             handleClear();
             setCheckoutStep("confirmed");
         } catch (err: unknown) {
@@ -52,7 +63,6 @@ export default function Checkout() {
             setCheckoutStep("summary");
         }
     }
-
 
     // Loading cart
     if (!sessionId || cartItems === undefined) return (
@@ -81,14 +91,14 @@ export default function Checkout() {
             <div className="flex flex-col justify-center items-center">
                 <h2 className="text-xl font-bold">Order confirmed!</h2>
                 <p className="font-bold">Order number:
-                    <span className="font-light px-2">{orderId}</span> 
+                    <span className="font-light px-2">{orderNumber}</span>
                 </p>
-                <p className="font-bold">Estimated wait time: 
-                    <span className="font-light px-2">{waitTime} minutes</span>
+                <p className="font-bold">Estimated wait time:
+                    <span className="font-light px-2">{confirmedWaitMinutes} minutes</span>
                 </p>
                 <Link href="/" className="flex items-center text-crema bg-rosso p-2 my-2 rounded">
                     Place a new order
-                    <Pizza aria-hidden="true" size={20} className="ml-2"/>
+                    <Pizza aria-hidden="true" size={20} className="ml-2" />
                 </Link>
             </div>
         </CheckoutShell>
@@ -127,8 +137,12 @@ export default function Checkout() {
                     ))}
                 </ul>
                 <div className="flex items-center justify-between px-4 py-3 my-3">
-                    <span className=" text-lg">Subtotal</span>
+                    <span className="font-semibold text-lg">Subtotal</span>
                     <span className="font-semibold text-lg">${subtotal}</span>
+                </div>
+                <div className="flex flex-col justify-between py-3 my-3">
+                    <label htmlFor="notes">Instructions</label>
+                    <textarea name="notes" id="notes" placeholder="Add special instructions here..." maxLength={150} className="bg-crema rounded-xl p-3" />
                 </div>
                 <Button
                     type="button"

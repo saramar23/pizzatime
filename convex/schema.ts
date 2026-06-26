@@ -78,7 +78,7 @@ export default defineSchema({
   // Tracks real-time stock levels. One row per menu_item.
   inventory: defineTable({
     menuItemId: v.id("menu_items"),
-    stock: v.number(),                        
+    stock: v.number(),
     lowStockThreshold: v.number(),            // warn agent when stock <= this
     soldToday: v.number(),                    // reset daily via cron
     updatedAt: v.number(),                    // Date.now() on each write
@@ -118,6 +118,7 @@ export default defineSchema({
     notes: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    orderNumber: v.number()
   })
     .index("by_session", ["sessionId"])
     .index("by_status", ["status"])
@@ -134,4 +135,11 @@ export default defineSchema({
   })
     .index("by_session", ["sessionId"])
     .index("by_session_time", ["sessionId", "createdAt"]),
+
+  // For order n#
+  counters: defineTable({
+    name: v.string(),
+    value: v.number()
+  })
+    .index("by_name", ["name"])
 })
