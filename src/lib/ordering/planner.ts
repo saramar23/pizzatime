@@ -42,7 +42,7 @@ export async function planOrder(
                     structuredOutput: {
                         schema: plannerSchema,
                         // Free model may not support the response_format API, so inject the
-                        // schema into the prompt instead. Less strict, but works more widely.
+                        // schema into the prompt as text.
                         jsonPromptInjection: true,
                     },
                 }

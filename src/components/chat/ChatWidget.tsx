@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { ChatMessages } from "./ChatMessages"
 import { ChatInput } from "./ChatInput"
 import { useSessionId } from "@/hooks/useSessionId"
+import { useChatMessages } from "@/hooks/useChatMessages"
 
 export type Message = {
   id: string
@@ -14,21 +15,74 @@ export type Message = {
 }
 
 export function ChatWidget() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content:
-        "Ciao! 👋 I'm Slice, your PizzaTime assistant. I can help you explore the menu, check calories, manage your cart, and estimate wait times. What can I get you?",
-    },
-  ])
+  const [isOpen, setIsOpen] = useState(false);
+  const { messages, setMessages } = useChatMessages();
   const [isLoading, setIsLoading] = useState(false);
-
   const sessionId = useSessionId();
 
+  const weatherRecommendation = async () => {
+    if (!sessionId) return;
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          messages,
+          isWeatherRequest: true
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error("Error fetching message.");
+      }
+
+      if (!res.body) {
+        throw new Error("Response body not available.");
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+
+      let assistantMessageId: string | null = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+
+        if (!assistantMessageId) {
+          assistantMessageId = crypto.randomUUID();
+          const id = assistantMessageId
+          setMessages(prev => [
+            ...prev,
+            { id, role: "assistant", content: chunk },
+          ])
+        } else {
+          const id = assistantMessageId
+          setMessages(prev =>
+            prev.map(msg =>
+              msg.id === id ? { ...msg, content: msg.content + chunk } : msg
+            )
+          )
+        }
+      }
+    }
+    catch (error) {
+      console.error("Error fetching weather recommendation message.");
+    }
+    finally {
+      setIsLoading(false);
+    }
+
+  }
+
   const sendMessage = async (content: string) => {
-    if (!content.trim() || isLoading || !sessionId) return
+    if (!content.trim() || isLoading || !sessionId) return;
 
     const userMessage: Message = {
       id: crypto.randomUUID(),
@@ -36,9 +90,9 @@ export function ChatWidget() {
       content,
     }
 
-    const updatedMessages = [...messages, userMessage]
-    setMessages(updatedMessages)
-    setIsLoading(true)
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setIsLoading(true);
 
     try {
       const res = await fetch("/api/chat", {
@@ -51,7 +105,7 @@ export function ChatWidget() {
       })
 
       if (!res.ok) {
-        const errorText = (await res.text()).trim()
+        const errorText = (await res.text()).trim();
         setMessages(prev => [
           ...prev,
           {
@@ -67,21 +121,21 @@ export function ChatWidget() {
         return
       }
 
-      if (!res.body) throw new Error("No response body")
+      if (!res.body) throw new Error("No response body");
 
-      const reader = res.body.getReader()
-      const decoder = new TextDecoder()
-      let assistantMessageId: string | null = null
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantMessageId: string | null = null;
 
       while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+        const { done, value } = await reader.read();
+        if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true })
-        if (!chunk) continue
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
 
         if (!assistantMessageId) {
-          assistantMessageId = crypto.randomUUID()
+          assistantMessageId = crypto.randomUUID();
           const id = assistantMessageId
           setMessages(prev => [
             ...prev,
@@ -121,6 +175,14 @@ export function ChatWidget() {
     }
   }
 
+  const handleChatToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setIsOpen(prev => !prev);
+
+    if (!isOpen && messages.length === 1 && sessionId) {
+      weatherRecommendation();
+    }
+  }
+
   return (
     <>
       <button
@@ -130,7 +192,7 @@ export function ChatWidget() {
           "shadow-[0_4px_20px_rgba(196,30,30,0.4)] transition-[transform,box-shadow] duration-200",
           "hover:scale-[1.08] hover:shadow-[0_6px_28px_rgba(196,30,30,0.5)]"
         )}
-        onClick={() => setIsOpen(prev => !prev)}
+        onClick={handleChatToggle}
         aria-label="Open chat"
       >
         {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
