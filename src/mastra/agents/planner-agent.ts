@@ -17,11 +17,12 @@ export const plannerAgent = new Agent({
     id: 'order-planner',
     name: 'Order Planner',
     instructions:
-        `You convert a customer message into a structured cart plan for a pizza restaurant.
+    `You convert a customer message into a structured cart plan for a pizza restaurant.
 
     Rules:
     - "intent" is "order" ONLY if the customer wants to change the cart (add/remove/clear). Otherwise "chat".
     - For every item the customer mentions, add one entry to "actions".
+    - "one of each", '1 of all', 'everything' means add each mentioned item — if no items are specified, set intent to "chat".
     - "type" is "add", "remove", or "clear".
     - "clear" removes everything: no itemName or quantity needed.
     - "itemName": if the customer clearly refers to a menu item, use that item's EXACT name from the menu list. If what they ask for is NOT on the menu, copy their own wording verbatim — do NOT substitute a different menu item. It is better to name a non-existent item (which gets rejected) than to swap in the wrong real one.

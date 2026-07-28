@@ -4,6 +4,7 @@ import { fetchQuery } from "convex/nextjs";
 import { NextRequest } from "next/server";
 import { api } from "../../../../convex/_generated/api";
 import { handleOrderMessage } from "@/lib/ordering/orchestrator";
+import { getWeather } from "@/mastra/tools/weather-tool";
 
 export const runtime = "nodejs";
 
@@ -176,9 +177,10 @@ async function runChatAgent(
           role: "system" as const,
           content: [
             "The chat UI already greeted the customer with a welcome message. Do not greet or welcome them again.",
-            "You do not change the cart — an ordering system handles adds, removes, and clears.",
+            "You do not change the cart: an ordering system handles adds, removes, and clears.",
             `Menu items: (only these exist): ${menuItemsList}`,
             cartContext,
+            `Session id: ${sessionId}`
           ].join(" "),
         },
       ],
@@ -193,57 +195,81 @@ async function runChatAgent(
 }
 
 export async function POST(req: NextRequest) {
-  const { messages, sessionId }: {
+  const { messages, sessionId, isWeatherRequest }: {
     messages: ChatMessage[];
     sessionId: string;
+    isWeatherRequest: boolean
   } = await req.json();
 
   if (!sessionId?.trim()) {
     return new Response("Session not ready. Please try again.", { status: 400 });
   }
 
-  try {
-    const agentMessages = toAgentMessages(messages);
-    const lastUserMessage =
-      [...agentMessages].reverse().find((message) => message.role === "user")
-        ?.content ?? "";
-    const previousAssistantMessage =
-      [...agentMessages].reverse().find((message) => message.role === "assistant")
-        ?.content;
-
-    // 1) Pipeline updates the cart; Slice narrates the factual outcome.
-    if (lastUserMessage) {
-      const orderResult = await handleOrderMessage(
-        lastUserMessage,
-        sessionId,
-        previousAssistantMessage
-      );
-      if (orderResult.intent === "order") {
-        const narrated = await narrateOrderResult(
-          orderResult.reply,
-          agentMessages
-        );
-        return streamTextResponse(sanitizeCustomerReply(orderResult.reply));
+  if (isWeatherRequest) {
+    const weather = await getWeather("Vancouver");
+    const agent = mastra.getAgent("restaurantAgent");
+    const menu = await fetchQuery(api.menu.getAllMenuItems);
+    const menuItemsList = menu.map(item => `${item.name} - ${item.description}`).join(", ");
+    const weatherOutput = await agent.stream(
+      [{ role: "user", content: "Make a weather-based food recommendation in 2-3 sentences." }],
+      {
+        context: [
+          {
+            role: "system" as const,
+            content: [
+              `Current weather in ${weather.location}: ${weather.temperature}°C, ${weather.conditions}`,
+              `Menu items: ${menuItemsList} (only these exist).`
+            ].join(" "),
+          },
+        ],
       }
+    )
+    const recommendation = await getFinalAnswerText(weatherOutput);
+    return streamTextResponse(recommendation);
+  } else {
+    try {
+      const agentMessages = toAgentMessages(messages);
+      const lastUserMessage =
+        [...agentMessages].reverse().find((message) => message.role === "user")
+          ?.content ?? "";
+      const previousAssistantMessage =
+        [...agentMessages].reverse().find((message) => message.role === "assistant")
+          ?.content;
+
+      // 1) Pipeline updates the cart; Slice narrates the factual outcome.
+      if (lastUserMessage) {
+        const orderResult = await handleOrderMessage(
+          lastUserMessage,
+          sessionId,
+          previousAssistantMessage
+        );
+        if (orderResult.intent === "order") {
+          const narrated = await narrateOrderResult(
+            orderResult.reply,
+            agentMessages
+          );
+          return streamTextResponse(sanitizeCustomerReply(narrated));
+        }
+      }
+
+      // 2) Not a cart action → let the restaurant agent converse.
+      const text = await runChatAgent(agentMessages, sessionId);
+      return streamTextResponse(text);
+    } catch (err) {
+      const message = chatErrorMessage(err);
+      const isRateLimit =
+        message.includes("429") ||
+        message.toLowerCase().includes("rate limit") ||
+        message.toLowerCase().includes("rate");
+
+      console.error("[chat]", message);
+
+      return new Response(
+        isRateLimit
+          ? "I'm temporarily unavailable (API rate limit). Try again later."
+          : message,
+        { status: isRateLimit ? 429 : 502 }
+      );
     }
-
-    // 2) Not a cart action → let the restaurant agent converse.
-    const text = await runChatAgent(agentMessages, sessionId);
-    return streamTextResponse(text);
-  } catch (err) {
-    const message = chatErrorMessage(err);
-    const isRateLimit =
-      message.includes("429") ||
-      message.toLowerCase().includes("rate limit") ||
-      message.toLowerCase().includes("rate");
-
-    console.error("[chat]", message);
-
-    return new Response(
-      isRateLimit
-        ? "I'm temporarily unavailable (API rate limit). Try again later."
-        : message,
-      { status: isRateLimit ? 429 : 502 }
-    );
   }
 }
