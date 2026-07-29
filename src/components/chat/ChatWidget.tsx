@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { MessageCircle, X, ChefHat } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ChatMessages } from "./ChatMessages"
@@ -19,6 +19,21 @@ export function ChatWidget() {
   const { messages, setMessages } = useChatMessages();
   const [isLoading, setIsLoading] = useState(false);
   const sessionId = useSessionId();
+  const notificationReady = useRef(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  // If not ready" = "if still on first run."
+  useEffect(() => {
+    if (!notificationReady.current) {
+      notificationReady.current = true;
+      return;
+    }
+
+    const lastMessage = messages.at(-1)?.role === "assistant";
+    if (lastMessage && !isOpen) {
+      setNotificationCount(count => count + 1);
+    }
+  }, [messages])
 
   const weatherRecommendation = async () => {
     if (!sessionId) return;
@@ -177,7 +192,7 @@ export function ChatWidget() {
 
   const handleChatToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     setIsOpen(prev => !prev);
-
+    setNotificationCount(0);
     if (!isOpen && messages.length === 1 && sessionId) {
       weatherRecommendation();
     }
@@ -185,19 +200,25 @@ export function ChatWidget() {
 
   return (
     <>
-      <button
-        type="button"
-        className={cn(
-          "fixed bottom-10 right-4 z-[98] flex size-12 cursor-pointer items-center justify-center rounded-full border-none bg-rosso text-crema",
-          "shadow-[0_4px_20px_rgba(196,30,30,0.4)] transition-[transform,box-shadow] duration-200",
-          "hover:scale-[1.08] hover:shadow-[0_6px_28px_rgba(196,30,30,0.5)]"
-        )}
-        onClick={handleChatToggle}
-        aria-label="Open chat"
-      >
-        {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
-      </button>
-
+      <div className="fixed bottom-10 right-4 z-[98]">
+        <button
+          type="button"
+          className={cn(
+            "relative flex size-12 cursor-pointer items-center justify-center rounded-full border-none bg-rosso text-crema",
+            "shadow-[0_4px_20px_rgba(196,30,30,0.4)] transition-[transform,box-shadow] duration-200",
+            "hover:scale-[1.08] hover:shadow-[0_6px_28px_rgba(196,30,30,0.5)]"
+          )}
+          onClick={handleChatToggle}
+          aria-label="Open chat"
+        >
+          {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
+        </button>
+        {
+          notificationCount > 0 && (
+            <span className="absolute text-center text-sm -top-1 -right-1 bg-verde text-crema rounded-full size-5">{notificationCount}</span>
+          )
+        }
+      </div>
       <div
         className={cn(
           "fixed w-full h-[80dvh] bottom-0 right-0 z-[99] md:w-100 md:h-120 md:bottom-20 md:right-10 flex flex-col overflow-hidden rounded-2xl bg-crema pb-[env(safe-area-inset-bottom,_16px)]",
