@@ -1,6 +1,7 @@
 import { Doc, Id } from "../../../convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
 function categoryEmoji(category: Doc<"menu_items">["category"]) {
   switch (category) {
@@ -26,14 +27,14 @@ interface MenuCardProps {
 export function MenuCard({ item, onAdd, cartQuantity }: MenuCardProps) {
 
   return (
-    <article className="group relative cursor-pointer overflow-hidden shadow-lg rounded-xl border border-crema/7 bg-crema-dark transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-gold/35">
+    <article className="group relative overflow-hidden shadow-lg rounded-xl border border-crema/7 bg-crema-dark transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-gold/35">
       {item.isFeatured && (
         <span className="absolute top-2.5 right-2.5 z-10 rounded-full bg-gold px-2.5 py-0.5 text-[0.65rem] font-semibold tracking-wide text-carbone uppercase">
           Today&apos;s Pick
         </span>
       )}
-      <div className="flex items-center justify-center aspect-video border-crema/5 ">
-        {item.imageUrl ? (<img src={item.imageUrl} alt={item.description} className="object-cover w-full h-full"/>) : 
+      <div className="relative flex items-center justify-center aspect-video border-crema/5 ">
+        {item.imageUrl ? (<Image src={item.imageUrl} alt={item.description} className="object-cover" fill sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"/>) : 
           (<span>{categoryEmoji(item.category)}</span>)
         }
       </div>
