@@ -1,12 +1,12 @@
 import Link from "next/link"
 import { Button } from "../ui/button"
+import { SheetTrigger } from "../ui/sheet"
 
 interface HeaderProps {
   cartCount: number
-  onCartOpen: () => void
 }
 
-export const Header = ({ cartCount, onCartOpen }: HeaderProps) => {
+export const Header = ({ cartCount }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 flex h-[72px] items-center justify-between border-b border-gold/20 bg-carbone px-8">
       <div>
@@ -21,13 +21,14 @@ export const Header = ({ cartCount, onCartOpen }: HeaderProps) => {
         </span>
       </div>
       <div className="flex items-center gap-6">
-        <Button
-          size="lg"
-          className="rounded-md border-none bg-rosso px-5 py-2 font-dmsans text-[0.85rem] font-medium tracking-wide text-crema transition-colors hover:bg-rosso-dark"
-          onClick={onCartOpen}
-        >
-          🛒 Cart {cartCount > 0 && `(${cartCount})`}
-        </Button>
+        <SheetTrigger asChild>
+          <Button
+            size="lg"
+            className="rounded-md border-none bg-rosso px-5 py-2 font-dmsans text-[0.85rem] font-medium tracking-wide text-crema transition-colors hover:bg-rosso-dark"
+          >
+            <span aria-hidden="true">🛒</span> Cart {cartCount > 0 && `(${cartCount})`}
+          </Button>
+        </SheetTrigger>
       </div>
     </header>
   )

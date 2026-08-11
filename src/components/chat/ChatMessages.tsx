@@ -20,8 +20,8 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
   return (
     <div
       className={cn(
-        "flex flex-1 flex-col gap-3 overflow-y-auto bg-crema p-4",
-        "[scrollbar-width:thin] [scrollbar-color:rgba(0,0,0,0.1)_transparent]"
+        "flex flex-1 flex-col gap-3 overflow-y-auto bg-crema-dark p-4",
+        "[scrollbar-width:thin] [scrollbar-color:color-mix(in_srgb,var(--carbone)_10%,transparent)_transparent]"
       )}
     >
       {messages.map(msg => {
@@ -37,9 +37,9 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
         >
           <div
             className={cn(
-              "max-w-[78%] break-words rounded-[14px] px-[0.9rem] py-[0.65rem] font-dmsans text-[0.83rem] leading-[1.55]",
+              "max-w-[78%] break-words rounded-[14px] p-3 font-dmsans text-sm leading-[1.55]",
               msg.role === "assistant" &&
-                "rounded-bl-[4px] bg-white text-carbone shadow-[0_1px_4px_rgba(0,0,0,0.07)]",
+                "rounded-bl-[4px] bg-crema text-carbone shadow-sm",
               msg.role === "user" && "rounded-br-[4px] bg-rosso text-crema"
             )}
           >
@@ -50,8 +50,9 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
       })}
 
       {isLoading && (
-        <div className="flex items-end gap-2">
-          <div className="flex w-fit items-center gap-1 rounded-[14px] rounded-bl-[4px] bg-white px-[0.9rem] py-[0.65rem] shadow-[0_1px_4px_rgba(0,0,0,0.07)]">
+        <div className="flex items-end gap-2" role="status" aria-live="polite">
+          <span className="sr-only">Slice is typing</span>
+          <div className="flex w-fit items-center gap-1 rounded-[14px] rounded-bl-[4px] bg-crema p-2 shadow-sm" aria-hidden="true">
             <div className="size-1.5 animate-bounce rounded-full bg-rosso opacity-40" />
             <div className="size-1.5 animate-bounce rounded-full bg-rosso opacity-40 [animation-delay:200ms]" />
             <div className="size-1.5 animate-bounce rounded-full bg-rosso opacity-40 [animation-delay:400ms]" />

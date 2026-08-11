@@ -1,12 +1,15 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { Dialog } from "radix-ui"
 import { MessageCircle, X, ChefHat } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { ChatMessages } from "./ChatMessages"
 import { ChatInput } from "./ChatInput"
 import { useSessionId } from "@/hooks/useSessionId"
 import { useChatMessages } from "@/hooks/useChatMessages"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
 
 export type Message = {
   id: string
@@ -14,16 +17,29 @@ export type Message = {
   content: string
 }
 
-export function ChatWidget() {
+export function ChatWidget({ isCartOpen = false }: { isCartOpen?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { messages, setMessages } = useChatMessages();
+  const { messages, setMessages, isHydrated } = useChatMessages();
   const [isLoading, setIsLoading] = useState(false);
   const sessionId = useSessionId();
   const notificationReady = useRef(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  // The panel only covers the whole screen on small viewports, so it is a modal
+  // dialog there and a non-modal companion panel on desktop.
+  const isDesktop = useMediaQuery("(min-width: 48rem)");
 
-  // If not ready" = "if still on first run."
+  // One modal at a time: cart owns the screen, so chat must close and leave the tree.
   useEffect(() => {
+    if (isCartOpen) {
+      setIsOpen(false);
+    }
+  }, [isCartOpen]);
+
+  // Skip until saved messages are restored, then skip that restore once.
+  // After that, only a new `messages` update can bump the badge.
+  useEffect(() => {
+    if (!isHydrated) return;
+
     if (!notificationReady.current) {
       notificationReady.current = true;
       return;
@@ -33,7 +49,7 @@ export function ChatWidget() {
     if (lastMessage && !isOpen) {
       setNotificationCount(count => count + 1);
     }
-  }, [messages])
+  }, [messages, isHydrated])
 
   const weatherRecommendation = async () => {
     if (!sessionId) return;
@@ -190,72 +206,106 @@ export function ChatWidget() {
     }
   }
 
-  const handleChatToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setIsOpen(prev => !prev);
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) return;
+
     setNotificationCount(0);
-    if (!isOpen && messages.length === 1 && sessionId) {
+    if (messages.length === 1 && sessionId) {
       weatherRecommendation();
     }
   }
 
+  const triggerLabel = isOpen
+    ? "Close chat"
+    : notificationCount > 0
+      ? `Open chat, ${notificationCount} new message${notificationCount > 1 ? "s" : ""}`
+      : "Open chat"
+
+  // Hide the FAB and panel while the cart modal owns the viewport.
+  if (isCartOpen) {
+    return null;
+  }
+
   return (
-    <>
+    <Dialog.Root open={isOpen} onOpenChange={handleOpenChange} modal={!isDesktop}>
       <div className="fixed bottom-10 right-4 z-[98]">
-        <button
-          type="button"
-          className={cn(
-            "relative flex size-12 cursor-pointer items-center justify-center rounded-full border-none bg-rosso text-crema",
-            "shadow-[0_4px_20px_rgba(196,30,30,0.4)] transition-[transform,box-shadow] duration-200",
-            "hover:scale-[1.08] hover:shadow-[0_6px_28px_rgba(196,30,30,0.5)]"
-          )}
-          onClick={handleChatToggle}
-          aria-label="Open chat"
-        >
-          {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
-        </button>
+        <Dialog.Trigger asChild>
+          <Button
+            type="button"
+            size="icon-lg"
+            className={cn(
+              "relative size-12 rounded-full border-none bg-rosso text-crema",
+              "shadow-[0_4px_20px_color-mix(in_srgb,var(--rosso)_40%,transparent)] transition-[transform,box-shadow] duration-200",
+              "hover:scale-[1.08] hover:bg-rosso-dark hover:shadow-[0_6px_28px_color-mix(in_srgb,var(--rosso)_50%,transparent)]"
+            )}
+            aria-label={triggerLabel}
+          >
+            {isOpen ? <X size={22} aria-hidden="true" /> : <MessageCircle size={22} aria-hidden="true" />}
+          </Button>
+        </Dialog.Trigger>
         {
           notificationCount > 0 && (
-            <span className="absolute text-center text-sm -top-1 -right-1 bg-verde text-crema rounded-full size-5">{notificationCount}</span>
+            <span aria-hidden="true" className="absolute text-center text-sm -top-1 -right-1 bg-verde text-crema rounded-full size-5">{notificationCount}</span>
           )
         }
       </div>
-      <div
-        className={cn(
-          "fixed w-full h-[80dvh] bottom-0 right-0 z-[99] md:w-100 md:h-120 md:bottom-20 md:right-10 flex flex-col overflow-hidden rounded-2xl bg-crema pb-[env(safe-area-inset-bottom,_16px)]",
-          "origin-bottom-right shadow-[0_8px_48px_rgba(0,0,0,0.35)] transition-[transform,opacity] duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-          isOpen
-            ? "scale-100 opacity-100"
-            : "pointer-events-none scale-[0.85] opacity-0"
+
+      <Dialog.Portal>
+        {!isDesktop && (
+          <Dialog.Overlay
+            className={cn(
+              "fixed inset-0 z-[98] bg-carbone/40",
+              "data-[state=open]:animate-in data-[state=open]:fade-in-0",
+              "data-[state=closed]:animate-out data-[state=closed]:fade-out-0"
+            )}
+          />
         )}
-      >
-        <div className="flex shrink-0 items-center justify-between bg-rosso px-5 py-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex size-[34px] items-center justify-center rounded-full bg-crema/20">
-              <ChefHat size={18} className="text-crema" />
+        <Dialog.Content
+          // On desktop the chat is non-modal, so clicking the page must not close it.
+          onInteractOutside={event => {
+            if (isDesktop) event.preventDefault();
+          }}
+          className={cn(
+            "fixed w-full h-[80dvh] bottom-0 right-0 z-[99] md:w-100 md:h-120 md:bottom-20 md:right-10 flex flex-col overflow-hidden rounded-2xl bg-crema pb-[env(safe-area-inset-bottom,_16px)]",
+            "origin-bottom-right shadow-[0_8px_48px_color-mix(in_srgb,var(--carbone)_35%,transparent)] duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+            "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-90",
+            "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-90"
+          )}
+        >
+          <div className="flex shrink-0 items-center justify-between bg-rosso px-5 py-4">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-[34px] items-center justify-center rounded-full bg-crema/20">
+                <ChefHat size={18} className="text-crema" aria-hidden="true" />
+              </div>
+              <div>
+                <Dialog.Title className="font-dmsans text-[0.9rem] font-semibold leading-tight text-crema">
+                  Slice
+                </Dialog.Title>
+                <Dialog.Description className="font-dmsans text-[0.7rem] font-light text-crema/70">
+                  <span className="mr-1 inline-block size-1.5 align-middle rounded-full bg-verde" aria-hidden="true" />
+                  PizzaTime Assistant
+                </Dialog.Description>
+              </div>
             </div>
-            <div>
-              <h4 className="font-dmsans text-[0.9rem] font-semibold leading-tight text-crema">
-                Slice
-              </h4>
-              <span className="font-dmsans text-[0.7rem] font-light text-crema/70">
-                <span className="mr-1 inline-block size-1.5 align-middle rounded-full bg-green-400" />
-                PizzaTime Assistant
-              </span>
-            </div>
+            <Dialog.Close asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                className="text-crema/80 hover:bg-crema/20 hover:text-crema"
+              >
+                <X size={18} aria-hidden="true" />
+                <span className="sr-only">Close chat</span>
+              </Button>
+            </Dialog.Close>
           </div>
-          <button
-            type="button"
-            className="flex cursor-pointer items-center justify-center rounded border-none bg-transparent p-0.5 text-crema/80 transition-colors hover:text-crema"
-            onClick={() => setIsOpen(false)}
-          >
-            <X size={18} />
-          </button>
-        </div>
 
-        <ChatMessages messages={messages} isLoading={isLoading} />
+          <ChatMessages messages={messages} isLoading={isLoading} />
 
-        <ChatInput onSend={sendMessage} isLoading={isLoading || !sessionId} />
-      </div>
-    </>
+          <ChatInput onSend={sendMessage} isLoading={isLoading || !sessionId} />
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   )
 }

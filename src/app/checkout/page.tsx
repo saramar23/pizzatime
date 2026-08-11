@@ -77,7 +77,7 @@ export default function Checkout() {
     // Processing order
     if (checkoutStep === "processing") return (
         <CheckoutShell>
-            <div className="flex flex-col justify-center items-center space-y-3">
+            <div className="flex flex-col justify-center items-center space-y-3" role="status" aria-live="polite">
                 <h2 className="text-xl font-bold">In progress</h2>
                 <p>Processing your order...</p>
                 <Loader2 size={22} className="animate-spin" aria-hidden="true" />
@@ -88,7 +88,7 @@ export default function Checkout() {
     // Order confirmed
     if (checkoutStep === "confirmed") return (
         <CheckoutShell>
-            <div className="flex flex-col justify-center items-center">
+            <div className="flex flex-col justify-center items-center" role="status" aria-live="polite">
                 <h2 className="text-xl font-bold">Order confirmed!</h2>
                 <p className="font-bold">Order number:
                     <span className="font-light px-2">{orderNumber}</span>
@@ -96,10 +96,15 @@ export default function Checkout() {
                 <p className="font-bold">Estimated wait time:
                     <span className="font-light px-2">{confirmedWaitMinutes} minutes</span>
                 </p>
-                <Link href="/" className="flex items-center text-crema bg-rosso p-2 my-2 rounded">
-                    Place a new order
-                    <Pizza aria-hidden="true" size={20} className="ml-2" />
-                </Link>
+                <Button
+                    asChild
+                    className="my-2 h-auto rounded-md bg-rosso p-2 text-crema hover:bg-rosso-dark"
+                >
+                    <Link href="/">
+                        Place a new order
+                        <Pizza aria-hidden="true" size={20} className="ml-2" />
+                    </Link>
+                </Button>
             </div>
         </CheckoutShell>
     )
@@ -110,12 +115,17 @@ export default function Checkout() {
             <div className="flex flex-col justify-center items-center space-y-3">
                 <h2 className="text-3xl mb-12 font-bold uppercase">Cart</h2>
                 <p>Your cart is empty.</p>
-                <Link href="/" className="flex items-center text-crema bg-rosso p-2 rounded">
-                    Order here
-                    <span className="ml-2">
-                        <ArrowRight aria-hidden="true" size={20} className="animate-pulse" />
-                    </span>
-                </Link>
+                <Button
+                    asChild
+                    className="h-auto rounded bg-rosso p-2 text-crema hover:bg-rosso-dark"
+                >
+                    <Link href="/">
+                        Order here
+                        <span className="ml-2">
+                            <ArrowRight aria-hidden="true" size={20} className="animate-pulse" />
+                        </span>
+                    </Link>
+                </Button>
             </div>
         </CheckoutShell>
     )

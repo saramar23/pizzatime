@@ -3,6 +3,7 @@ import { Message } from "@/components/chat/ChatWidget";
 
 export function useChatMessages() {
     const initialized = useRef(false);
+    const [isHydrated, setIsHydrated] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "welcome",
@@ -19,6 +20,7 @@ export function useChatMessages() {
             setMessages(messageToObj);
         }
         initialized.current = true;
+        setIsHydrated(true);
     }, [])
 
     useEffect(() => {
@@ -29,5 +31,5 @@ export function useChatMessages() {
             sessionStorage.setItem("pt-messages", messageToString);
         }
     }, [messages])
-    return { messages, setMessages }
+    return { messages, setMessages, isHydrated }
 }
