@@ -34,8 +34,8 @@ export function MenuCard({ item, onAdd, cartQuantity }: MenuCardProps) {
         </span>
       )}
       <div className="relative flex items-center justify-center aspect-video border-crema/5 ">
-        {item.imageUrl ? (<Image src={item.imageUrl} alt={item.description} className="object-cover" fill sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"/>) : 
-          (<span>{categoryEmoji(item.category)}</span>)
+        {item.imageUrl ? (<Image src={item.imageUrl} alt="" className="object-cover" fill sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"/>) : 
+          (<span aria-hidden="true">{categoryEmoji(item.category)}</span>)
         }
       </div>
       <div className="p-4 flex flex-col h-36">
@@ -56,7 +56,10 @@ export function MenuCard({ item, onAdd, cartQuantity }: MenuCardProps) {
           </span>
           <div className="relative">
             {cartQuantity > 0 && (
-              <span className="absolute -top-2 -right-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-gold/80 text-[0.8rem] font-bold text-carbone">
+              <span
+                aria-hidden="true"
+                className="absolute -top-2 -right-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-gold text-crema text-[0.8rem] font-bold text-carbone"
+              >
                 {cartQuantity}
               </span>
             )}
@@ -66,6 +69,11 @@ export function MenuCard({ item, onAdd, cartQuantity }: MenuCardProps) {
                 "h-auto rounded-md border-none bg-rosso px-3 py-1 text-[0.78rem] font-medium text-crema transition-colors hover:bg-rosso-dark",
               )}
               onClick={() => onAdd(item._id, item.name, item.price)}
+              aria-label={
+                cartQuantity > 0
+                  ? `Add ${item.name} to cart. ${cartQuantity} already in cart.`
+                  : `Add ${item.name} to cart.`
+              }
             >
               + Add
             </Button>
