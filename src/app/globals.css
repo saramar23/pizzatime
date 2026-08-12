@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Design tokens — keep in CSS so themes, dark mode, and brand colors stay in one place */
+/* Design tokens */
 :root {
   --rosso: #c41e1e;
   --rosso-dark: #8b0000;
@@ -12,6 +12,7 @@
   --crema-dark: #ede8dc;
   --carbone: #1a1008;
   --gold: #c9973a;
+  --ring: var(--carbone);
 }
 
 @theme inline {
@@ -22,6 +23,7 @@
   --color-rosso-dark: var(--rosso-dark);
   --color-gold: var(--gold);
   --color-verde: var(--verde);
+  --color-ring: var(--ring);
   --font-playfair: var(--font-playfair), ui-serif, serif;
   --font-dmsans: var(--font-dmsans), ui-sans-serif, sans-serif;
 }
@@ -29,5 +31,11 @@
 @layer base {
   body {
     @apply bg-crema font-dmsans text-carbone antialiased;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  a[href] {
+    cursor: pointer;
   }
 }

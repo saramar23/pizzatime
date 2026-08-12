@@ -11,7 +11,7 @@ export const Header = ({ cartCount }: HeaderProps) => {
     <header className="sticky top-0 z-50 flex h-[72px] items-center justify-between border-b border-gold/20 bg-carbone px-8">
       <div>
         <Link href="/">
-          <div className="font-playfair text-[1.6rem] font-bold tracking-tight text-crema cursor-pointer"
+          <div className="font-playfair text-[1.6rem] font-bold tracking-tight text-crema"
           >
             Pizza<span className="text-rosso">Time</span>
           </div>

@@ -152,7 +152,13 @@ export default function Checkout() {
                 </div>
                 <div className="flex flex-col justify-between py-3 my-3">
                     <label htmlFor="notes">Instructions</label>
-                    <textarea name="notes" id="notes" placeholder="Add special instructions here..." maxLength={150} className="bg-crema rounded-xl p-3" />
+                    <textarea
+                        name="notes"
+                        id="notes"
+                        placeholder="Add special instructions here..."
+                        maxLength={150}
+                        className="rounded-xl bg-crema p-3 outline-none focus-visible:border focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-crema-dark"
+                    />
                 </div>
                 <Button
                     type="button"

@@ -4,7 +4,7 @@ import { MenuGrid } from "@/components/menu/MenuGrid";
 export default function Home() {
 
     return (
-        <main>
+        <main id="main-content">
             <Hero />
             <MenuGrid />
         </main>

@@ -222,12 +222,17 @@ export function ChatWidget({ isCartOpen = false }: { isCartOpen?: boolean }) {
       ? `Open chat, ${notificationCount} new message${notificationCount > 1 ? "s" : ""}`
       : "Open chat"
 
-  // Hide the FAB and panel while the cart modal owns the viewport.
-  if (isCartOpen) {
-    return null;
-  }
+  const notificationStatus =
+    !isOpen && notificationCount > 0
+      ? `${notificationCount} new message${notificationCount > 1 ? "s" : ""} from Slice`
+      : ""
 
   return (
+    <>
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {notificationStatus}
+      </div>
+      {!isCartOpen && (
     <Dialog.Root open={isOpen} onOpenChange={handleOpenChange} modal={!isDesktop}>
       <div className="fixed bottom-10 right-4 z-[98]">
         <Dialog.Trigger asChild>
@@ -307,5 +312,7 @@ export function ChatWidget({ isCartOpen = false }: { isCartOpen?: boolean }) {
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
+      )}
+    </>
   )
 }

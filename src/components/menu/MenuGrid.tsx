@@ -30,10 +30,10 @@ export function MenuGrid() {
         activeCategory={activeCategory}
         onCategoryChange={setActiveCategory}
       />
-      <section className="mx-auto max-w-[1200px] p-8">
-        <p className="mb-6 font-medium uppercase tracking-[0.18em] text-gold">
+      <section id="menu" className="mx-auto max-w-[1200px] p-8">
+        <h2 className="mb-6 font-bold uppercase tracking-[0.18em] text-gold">
           Our Menu
-        </p>
+        </h2>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5">
           {isLoading
             ? Array.from({ length: SKELETON_COUNT }, (_, index) => (
@@ -41,7 +41,7 @@ export function MenuGrid() {
             ))
             : filtered.length === 0
               ? (
-                <p className="col-span-full text-center text-sm text-crema/50">
+                <p className="col-span-full text-center text-sm text-carbone">
                   No items in this category.
                 </p>
               )

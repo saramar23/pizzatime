@@ -35,6 +35,12 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col">
         <Providers>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:rounded-md focus:bg-crema focus:px-4 focus:py-2 focus:font-medium focus:text-carbone focus:outline-none focus:ring-3 focus:ring-ring focus:ring-offset-2 focus:ring-offset-carbone"
+          >
+            Skip to main content
+          </a>
           <div className="flex-1">
             <PageClient />
             {children}
